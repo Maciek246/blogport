@@ -1,6 +1,5 @@
-import express from 'express';
+import app from './src/app';
 
-const app = express();
 const port = process.env.PORT || 8000
 
 app.listen(port, () => {
