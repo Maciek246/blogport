@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import redis from 'express-redis';
 import routes from './routes';
+import { catchErrors } from './middlewares/errors';
 
 dotenv.config({path: '../.env'})
 dotenv.load();
@@ -20,5 +21,7 @@ app.use(redis_connection)
 
 app.use('/', routes.applicationRouter);
 app.use('/user', routes.userRouter);
+app.use('/blog', routes.blogRouter);
 
+app.use(catchErrors);
 export default app;

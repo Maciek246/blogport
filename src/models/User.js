@@ -76,6 +76,8 @@ userSchema.methods.toJSON = function(){
         username: this.username,
         email: this.email,
         description: this.description,
+        first_name: this.first_name,
+        last_name: this.last_name,
         data_of_join: this.data_of_join
     }
 }

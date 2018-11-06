@@ -13,13 +13,12 @@ export default {
     },
     
     async register(req, res, next){
-        const { username, password, password2, email } = req.body;
+        const { username, password, password2, email, first_name, last_name } = req.body;
         if(password !== password2) return next({message: "Password and confirm password aren't equal", status: 400})
 
-        User.create({ username: username, password: password, email: email, date_of_join: new Date() }).then(user => {
+        User.create({ username, password, email, first_name, last_name, date_of_join: new Date() }).then(user => {
             res.json({ user: user.toAuthJSON() })
         }).catch(err => {
-            //console.log("ERROR: ", err)
             next(err)
         })
     },
