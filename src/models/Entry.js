@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import URLSlugs from 'mongoose-url-slugs';
 
-const entrySchema = new monogoose.Schema({
+const entrySchema = new mongoose.Schema({
     title: {
         type: String,
         required: [true, "can't be blank"],
-        index: true
+        index: { unique: true },
     },
     content: {
         type: String,
@@ -15,12 +16,13 @@ const entrySchema = new monogoose.Schema({
         author: { 
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
-        },
-        created: { type: Date }
+        }
     }],
 },{
     versionKey: false,
     timestamps: true
 })
+
+entrySchema.plugin(URLSlugs('title', {field: 'slug', update: true}));
 
 export default mongoose.model('Entry', entrySchema);

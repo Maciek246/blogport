@@ -5,7 +5,7 @@ const blogSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "can't be blank"],
-        unique: true
+        index: { unique: true },
     },
     author: { 
         type: mongoose.Schema.Types.ObjectId, 
@@ -20,5 +20,12 @@ const blogSchema = new mongoose.Schema({
 });
 
 blogSchema.plugin(URLSlugs('name', {field: 'slug', update: true}));
+
+blogSchema.methods.checkPermission = function(user){
+    if(this.author.equals(user._id)){
+        return true;
+    }
+    return false;
+}
 
 export default mongoose.model('Blog', blogSchema);
