@@ -11,6 +11,11 @@ const blogSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User' 
     },
+	category: {
+		type: String,
+		required: [true, "can't be blank"],
+		index: true,
+	},
     entries: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Entry' 

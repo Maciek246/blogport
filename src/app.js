@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import redis from 'express-redis';
@@ -17,6 +18,7 @@ mongoose.connect(process.env.DB_URI, { useNewUrlParser: true });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
+app.use(cors());
 app.use(redis_connection)
 
 app.use('/', routes.applicationRouter);

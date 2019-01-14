@@ -88,4 +88,10 @@ userSchema.methods.checkPassword = async function(password){
     return result;
 }
 
+userSchema.statics.getUserById = async function(id){
+    const a = await this.findOne({_id: id});
+    let u = a.username
+    return u
+}
+
 export default mongoose.model('User', userSchema);

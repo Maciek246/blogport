@@ -1,13 +1,15 @@
 import Blog from '../models/Blog';
+import User from '../models/User';
 
 export default {
     
     async create(req, res, next){
         const name = req.body.name;
+        const category = req.body.category;
         try{
-            const blog = await Blog.create({name, author: req.user});
+            const blog = await Blog.create({name, author: req.user, category});
             let path = `${req.protocol}://${req.hostname}${req.originalUrl}/${blog.slug}`;
-            res.json({name: blog.name, url: path})
+            res.json({name: blog.name, url: path, category: blog.category})
         }
         catch(err){
             next(err);
@@ -15,13 +17,38 @@ export default {
     },
 
     async findOne(req, res, next){
-        const blog = req.blog;
+        let blog = await Blog.aggregate([
+            {
+                "$match": {slug: req.params.blog_slug}
+            },
+            {
+                "$lookup": {
+                    from: "entries",
+                    localField: "entries",
+                    foreignField: "_id",
+                    as: "entries"
+                    }
+            }])
+        blog = {...blog[0], author: await User.getUserById(blog[0].author)}
         res.status(200).json({data: blog});
     },
 
     async findAll(req, res, next){
-        const blogs = await Blog.find({});
+        let blogs = await Blog.aggregate([
+            {
+                "$lookup": {
+                    from: "entries",
+                    localField: "entries",
+                    foreignField: "_id",
+                    as: "entries"
+                    }
+            }])
         if(!blogs) return next();
+        for(let i=0; i < blogs.length; i++){
+             if(blogs[i].author){
+                 blogs[i] = {...blogs[i], author: await User.getUserById(blogs[i].author)}
+             }
+        }
         res.status(200).json({total: blogs.length, data: blogs});
     },
 

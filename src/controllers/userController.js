@@ -29,7 +29,7 @@ export default {
         try{
             let user = await User.findOne({username: username});
             if(user){
-                if(user.checkPassword(password)){
+                if(await user.checkPassword(password)){
                     user.last_login = new Date();
                     user.save();
                     res.json({ user: user.toAuthJSON() })
@@ -38,6 +38,7 @@ export default {
                     next({status: 400, message: "Password incorrect"})
                 }
             }
+            else return next({status: 400, message: "User does not exists"})
         }
         catch(err){
             return next(err);
