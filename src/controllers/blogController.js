@@ -29,7 +29,8 @@ export default {
                     as: "entries"
                     }
             }])
-        blog = {...blog[0], author: await User.getUserById(blog[0].author)}
+        req.redis = await req.redis.asyncIncr(`${req.params.blog_slug}:views`) 
+        blog = {...blog[0], author: await User.getUserById(blog[0].author), views: req.redis}
         res.status(200).json({data: blog});
     },
 
@@ -48,6 +49,7 @@ export default {
              if(blogs[i].author){
                  blogs[i] = {...blogs[i], author: await User.getUserById(blogs[i].author)}
              }
+             blogs[i] = {...blogs[i], views: await req.redis.asyncGet(`${blogs[i].slug}:views`)}
         }
         res.status(200).json({total: blogs.length, data: blogs});
     },
@@ -55,7 +57,6 @@ export default {
     async update(req, res, next){
         const blog = req.blog;
         const body = req.body;
-        // Spawdzic czy zadziala jako zwykly user
         if(blog.checkPermission(req.user) || req.user.is_staff){
             for(let key in body){
                 blog[`${key}`] = body[`${key}`];
@@ -76,8 +77,10 @@ export default {
 
     async delete(req, res, next){
         const blog = req.blog;
-        // Temporary return only json message and don't delete a blog
-        if(blog.author == req.user || req.user.is_staff){            
+        const author = String(blog.author);
+        const user_id = String(req.user._id); 
+        if(author == user_id || req.user.is_staff){  
+            await Blog.deleteOne({ name: blog.name })          
             return res.json({message: "Blog deleted"});
         }
         next({status: 403, message: "You have no permission for delete"});
